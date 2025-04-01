@@ -12,7 +12,7 @@ This application is a language learning tool designed to help users translate an
 
 **Goal:** Enable basic word definition retrieval.  
 **Key Features:**  
-[ ] Select a single word → fetch and display its dictionary entry.  
+[x] Select a single word → fetch and display its dictionary entry.  
 **Technical Tasks:**
 
 1. Build a simple UI for word selection.
