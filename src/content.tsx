@@ -5,12 +5,15 @@ import { store } from "./store/store";
 import DictionaryLookup from "./components/DictionaryLookup";
 import "./styles/tailwind.css";
 import { showDictionary } from "./store/slices/dictionarySlice";
+import { openDB } from './api/databaseApi';
 
 /**
  * Initialize the dictionary lookup extension
  * Creates a container for the React app and sets up event listeners
  */
-const init = () => {
+const init = async () => {
+	await openDB();
+
 	// Create and append container for React app
 	const container = document.createElement("div");
 	container.id = "dictionary-root";
