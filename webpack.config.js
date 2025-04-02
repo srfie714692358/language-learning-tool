@@ -1,6 +1,7 @@
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
 	entry: "./src/content.tsx",
@@ -48,4 +49,8 @@ module.exports = {
 		},
 	},
 	mode: process.env.NODE_ENV === "production" ? "production" : "development",
+	optimization: {
+		minimize: true,
+		minimizer: [new TerserPlugin()],
+	},
 };
