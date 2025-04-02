@@ -1,3 +1,6 @@
+// DictionaryLookup.tsx
+// Popup component for displaying dictionary definitions with database caching
+
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
@@ -8,7 +11,7 @@ const DictionaryLookup = () => {
 	const popupRef = useRef<HTMLDivElement>(null);
 	const { definition, isLoading, error, isVisible, selectedText } = useSelector((state: RootState) => state.dictionary);
 
-	// Handle outside clicks to close popup
+	// Handle outside click to close popup
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
@@ -25,7 +28,7 @@ const DictionaryLookup = () => {
 		};
 	}, [isVisible, dispatch]);
 
-	// Fetch definition when selected text changes
+	// Trigger definition lookup when selection changes
 	useEffect(() => {
 		if (selectedText) {
 			dispatch(fetchDefinitionWithDBCheck(selectedText));
@@ -42,20 +45,20 @@ const DictionaryLookup = () => {
 		>
 			<h1 className="text-xl font-bold mb-2">Dictionary Lookup</h1>
 
-			{/* Selected text display */}
+			{/* Display selected word */}
 			{selectedText && (
 				<div className="mb-2 p-2 bg-gray-100 rounded dark:bg-gray-700">
 					<span className="font-medium">Selected text:</span> {selectedText}
 				</div>
 			)}
 
-			{/* Loading state */}
+			{/* Loading state indicator */}
 			{isLoading && <p className="text-gray-600 dark:text-gray-400">Loading definition...</p>}
 
-			{/* Error message */}
+			{/* Error message display */}
 			{error && <p className="text-red-500 mt-2">{error}</p>}
 
-			{/* Definition display */}
+			{/* Definition content display */}
 			{definition && (
 				<div className="mt-4">
 					<h2 className="font-bold">Definition:</h2>

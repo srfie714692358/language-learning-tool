@@ -27,9 +27,9 @@ This application is a language learning tool designed to help users translate an
 **Goal:** Cache frequently accessed words locally.  
 **Key Features:**
 
--   Check if a word exists in the local database.  
-     [ ] If yes: Retrieve from DB.  
-     [ ] If no: Fetch from API, save to DB, then display.  
+- [x]   Check if a word exists in the local database.  
+   -  [x] If yes: Retrieve from DB.  
+   -  [x] If no: Fetch from API, save to DB, then display.  
     **Technical Tasks:**
 
 1. Set up a local database (e.g., SQLite or IndexedDB).

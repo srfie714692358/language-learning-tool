@@ -1,9 +1,12 @@
-// db.ts
+// databaseApi.ts
+// Database initialization and CRUD operations for word definitions
+
 const DB_NAME = "LanguageLearningDB";
 const STORE_NAME = "words";
 
 let db: IDBDatabase;
 
+// Open database connection with version control
 export const openDB = (): Promise<IDBDatabase> => {
 	return new Promise((resolve, reject) => {
 		const request = indexedDB.open(DB_NAME, 1);
@@ -21,6 +24,7 @@ export const openDB = (): Promise<IDBDatabase> => {
 	});
 };
 
+// Check if word exists in IndexedDB
 export const checkWordInDB = async (word: string): Promise<string | null> => {
 	if (!db) await openDB();
 	return new Promise((resolve, reject) => {
@@ -32,6 +36,7 @@ export const checkWordInDB = async (word: string): Promise<string | null> => {
 	});
 };
 
+// Save word-definition pair to IndexedDB
 export const saveWordToDB = async (word: string, definition: string): Promise<void> => {
 	if (!db) await openDB();
 	return new Promise((resolve, reject) => {
