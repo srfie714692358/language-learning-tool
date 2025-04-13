@@ -1,49 +1,21 @@
-// databaseApi.ts
-// Database initialization and CRUD operations for word definitions
+const STORAGE_KEY = "savedWords"; // Key to store the list of words in extension storage.
 
-const DB_NAME = "LanguageLearningDB";
-const STORE_NAME = "words";
-
-let db: IDBDatabase;
-
-// Open database connection with version control
-export const openDB = (): Promise<IDBDatabase> => {
-	return new Promise((resolve, reject) => {
-		const request = indexedDB.open(DB_NAME, 1);
-		request.onerror = () => reject("Database error");
-		request.onsuccess = () => {
-			db = request.result;
-			resolve(db);
-		};
-		request.onupgradeneeded = () => {
-			db = request.result;
-			if (!db.objectStoreNames.contains(STORE_NAME)) {
-				db.createObjectStore(STORE_NAME, { keyPath: "word" });
-			}
-		};
-	});
+// Check if a word exists in the extension's storage.
+export const checkWordInStorage = async (word: string): Promise<string | null> => {
+	const result = await chrome.storage.local.get(STORAGE_KEY); // Retrieve saved words from storage.
+	const savedWords = result[STORAGE_KEY] || []; // Default to an empty array if no words are saved.
+	const entry = savedWords.find((w: any) => w.word === word); // Find the word in the saved list.
+	return entry ? entry.definition : null; // Return the definition if found, otherwise null.
 };
 
-// Check if word exists in IndexedDB
-export const checkWordInDB = async (word: string): Promise<string | null> => {
-	if (!db) await openDB();
-	return new Promise((resolve, reject) => {
-		const transaction = db.transaction(STORE_NAME, "readonly");
-		const store = transaction.objectStore(STORE_NAME);
-		const request = store.get(word);
-		request.onsuccess = () => resolve(request.result?.definition || null);
-		request.onerror = () => reject("Error checking word");
-	});
-};
-
-// Save word-definition pair to IndexedDB
-export const saveWordToDB = async (word: string, definition: string): Promise<void> => {
-	if (!db) await openDB();
-	return new Promise((resolve, reject) => {
-		const transaction = db.transaction(STORE_NAME, "readwrite");
-		const store = transaction.objectStore(STORE_NAME);
-		store.put({ word, definition });
-		transaction.oncomplete = () => resolve();
-		transaction.onerror = () => reject("Error saving word");
-	});
+// Save a word-definition pair to the extension's storage if it doesn't already exist.
+export const saveWordToStorage = async (word: string, definition: string): Promise<void> => {
+	const result = await chrome.storage.local.get(STORAGE_KEY); // Retrieve saved words from storage.
+	const savedWords = result[STORAGE_KEY] || []; // Default to an empty array if no words are saved.
+	if (!savedWords.some((w: any) => w.word === word)) {
+		// Check if the word is already saved.
+		await chrome.storage.local.set({
+			[STORAGE_KEY]: [...savedWords, { word, definition }], // Add the new word to the list.
+		});
+	}
 };

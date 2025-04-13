@@ -1,8 +1,5 @@
-// dictionarySlice.ts
-// Redux slice managing dictionary lookup state and async operations
-
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { checkWordInDB, saveWordToDB } from "../../api/databaseApi";
+import { checkWordInStorage, saveWordToStorage } from "../../api/databaseApi"; // Updated to use extension storage functions.
 import { fetchWordDefinition } from "../../api/dictionaryApi";
 
 interface DictionaryState {
@@ -21,17 +18,17 @@ const initialState: DictionaryState = {
 	isVisible: false,
 };
 
-// Async thunk for cached definition lookup
+// Async thunk for cached definition lookup using extension storage.
 export const fetchDefinitionWithDBCheck = createAsyncThunk<string, string, { rejectValue: string }>(
-	"dictionary/fetchDefinitionWithDBCheck",
+	"dictionary/fetchDefinitionWithDBCheck", // Action type prefix.
 	async (word: string, thunkAPI) => {
 		try {
-			const existing = await checkWordInDB(word);
+			const existing = await checkWordInStorage(word); // Check if the word exists in extension storage.
 			if (existing) return existing;
 
-			const meanings = await fetchWordDefinition(word);
-			const definition = meanings[0]?.definitions[0]?.definition || "Not found";
-			await saveWordToDB(word, definition);
+			const meanings = await fetchWordDefinition(word); // Fetch the word's definition from the API.
+			const definition = meanings[0]?.definitions[0]?.definition || "Not found"; // Extract the definition.
+			await saveWordToStorage(word, definition); // Save the word to extension storage if not already saved.
 			return definition;
 		} catch (err) {
 			return thunkAPI.rejectWithValue("Failed to fetch definition");
@@ -67,7 +64,7 @@ const dictionarySlice = createSlice({
 				state.isLoading = false;
 				state.definition = action.payload;
 			})
-			.addCase(fetchDefinitionWithDBCheck.rejected, (state, action) => {
+			.addCase(fetchDefinitionWithDBCheck.rejected, (state, action: PayloadAction<string | undefined>) => {
 				state.isLoading = false;
 				state.error = action.payload || "Unknown error";
 			});

@@ -8,11 +8,9 @@ import { store } from "./store/store";
 import DictionaryLookup from "./components/DictionaryLookup";
 import "./styles/tailwind.css";
 import { showDictionary } from "./store/slices/dictionarySlice";
-import { openDB } from "./api/databaseApi";
 
 // Initialize extension components and event listeners
-const init = async () => {
-	await openDB(); // Initialize database connection
+const init = () => {
 
 	// Create container for React app
 	const container = document.createElement("div");
