@@ -20,15 +20,23 @@ const initialState: DictionaryState = {
 
 // Async thunk for cached definition lookup using extension storage.
 export const fetchDefinitionWithDBCheck = createAsyncThunk<string, string, { rejectValue: string }>(
-	"dictionary/fetchDefinitionWithDBCheck", // Action type prefix.
+	"dictionary/fetchDefinitionWithDBCheck",
 	async (word: string, thunkAPI) => {
 		try {
-			const existing = await checkWordInStorage(word); // Check if the word exists in extension storage.
+			const existing = await checkWordInStorage(word);
 			if (existing) return existing;
 
-			const meanings = await fetchWordDefinition(word); // Fetch the word's definition from the API.
-			const definition = meanings[0]?.definitions[0]?.definition || "Not found"; // Extract the definition.
-			await saveWordToStorage(word, definition); // Save the word to extension storage if not already saved.
+			const meanings = await fetchWordDefinition(word);
+			const definition = meanings[0]?.definitions[0]?.definition || "Not found";
+
+			// Only save to storage if a valid definition was retrieved
+			if (definition !== "Not found") {
+				await saveWordToStorage(word, definition);
+			} else {
+				// Avoid saving "Not found" entries
+				console.warn(`No valid definition found for: ${word}`);
+			}
+
 			return definition;
 		} catch (err) {
 			return thunkAPI.rejectWithValue("Failed to fetch definition");
